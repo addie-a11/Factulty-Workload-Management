@@ -1,0 +1,126 @@
+import os 
+import pandas as pd 
+
+FILENAME = "workload.csv"
+MAX_LIMIT =16
+
+
+def create_sample_csv_if_missing():
+    if not os.path.exists(FILENAME):
+      data ={
+        "Faculty": [
+              "Dr.Sharma",
+               "Dr.Sharma",
+               "Dr.Verma",
+               "Dr.Verma",
+               "Dr.Verma",
+               "Dr.Iyer",
+        ],
+        "Subject": ["DAA", "DBMS", "OOP", "Maths", "Lab", "Networks"],
+        "Hours": [6, 5, 6, 6, 6, 4],
+
+      }
+      df = pd.DataFrame(data)
+      df.to_csv(FILENAME, index=False)
+
+
+def load_data():
+  try:
+    if not os.path.exists(FILENAME):
+      create_sample_csv_if_missing()
+      df = pd.read_csv(FILENAME)
+      return df 
+      expect Exceotion as e:
+      print(f"Error: {e}")
+      return None 
+
+def show_workload_summary(df):
+  if df is None or df.empty:
+    print("No data available.")
+    return
+    summary = df.groupby("Faculty")["Hours"].sum().reset_index()
+    print("\n--- Workload Summary ---")
+    for _, row in summary.iterrows():
+      faculty = row["Faculty"]
+      total_hours = row["Hours"]
+      if total_hours > MAX_LIMIT:
+        print(
+          f"{faculty}:{total_hours} hours - OVERLOADED by"
+          f" {total_hours - MAX_LIMIT} hours"
+        )
+      else:
+        print(
+          f"{faculty} : {total_hours} hours ({MAX_LIMIT - total_hours} free)"
+        )
+
+def assign_subject(df):
+  if df is None:
+    return df 
+    faculty = input("Enter Faculty name: ").strip()
+    subject = input("Enter Subject name: ").strip()
+    try:
+      hours = float(input("Hours: ").strip())
+    except ValueError:
+      print("Error: Hours must be a positive whole number.")
+      return df 
+
+if hours <= 0 or int(hours) != hours:
+  print("Error: Hours must be a positive whole number.")
+  return df 
+  hours = int(hours)
+
+current_total = 0
+if not df.empty and "Faculty" in df.columns:
+  faculty_rows = df[df["Faculty"].str.lower() == faculty.lower()]
+  if not faculty_rows.empty:
+    cureent_total = faculty_rows["Hours"].sum()
+
+new_total = cureent_total + hours
+if new_total > MAX_LIMIT:
+  print(
+    f"Cannot assign : {faculty} would have {new_total} hours, exceeding"
+    f" the {MAX_LIMIT}-hour limit."
+  )
+  return df 
+
+new_row = pd.DataFrame(
+  [{"Faculty": faculty, "Subject":subject, "Hours": hours}]
+)
+df = pd.concat([df, new_row], ignore_index=True)
+df.to_csv(FILENAME, index=False)
+print(f"Assigned. {faculty} now has {new_total} hours (limit reached).")
+return df 
+
+
+def find_faculty_with_free_hours(df):
+if df is None:
+  return
+  try:
+    hours_needed = int(input("Hours needed: "))
+  except ValueError:
+    print("Invailed input.")
+    return
+    summary = df.groupby("Faculty")["Hours"].sum().reset_index()
+    print(f"\nFaculty available for{hours_needed:
+    for _, row in summary.iterrows():
+     if MAX_LIMIT - row{"Hourrs"] >= hours_needed:
+        print(f"{row['Faculty']} : {MAX_LIMIT - row['Hours']} hours free")
+
+    def main ():
+       create_sample_csv_if_missing()   
+        while True:
+           print("\n1. Show workload summary\n2. Assign subject\n3. Find faculty with free hours\n4. Exists")
+           choice = input("Enter choice (1-4): ").strip()
+            df = load_data ()
+             if choice == "1":
+                show_workload_summary(df)
+                            elif  choice == "2":
+                                    df = assign_subject(df)
+                                    elif choice == "3":
+                                    find_faculty_with_free_hours(df)
+                                    elif choice == "4": 
+                                    break
+
+if __name__ == "__main__":
+      main()                              
+                                    
